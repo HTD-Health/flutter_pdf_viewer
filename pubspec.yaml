@@ -1,0 +1,22 @@
+name: pdf_platform_view
+description: Flutter plugin for displaying PDF files on IOS and Android platforms using Platform Views.
+version: 0.5.0+2
+homepage: https://github.com/kamilklyta/flutter_pdf_viewer
+repository: https://github.com/kamilklyta/flutter_pdf_viewer
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+  flutter: ">=1.12.0 <2.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.htdevelopers.pdfviewer
+        pluginClass: PdfViewerPlugin
+      ios:
+        pluginClass: PdfViewerPlugin

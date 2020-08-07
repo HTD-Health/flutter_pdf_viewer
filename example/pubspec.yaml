@@ -1,0 +1,21 @@
+name: pdf_viewer_example
+description: Demonstrates how to use the pdf_platform_view plugin.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^0.4.1
+  cupertino_icons: ^0.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  pdf_platform_view:
+    path: ../
+
+flutter:
+  uses-material-design: true
