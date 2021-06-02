@@ -3,7 +3,13 @@ package com.htdevelopers.pdfviewer;
 import android.content.Context;
 import android.view.View;
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
+import com.github.barteksc.pdfviewer.listener.OnRenderListener;
+
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -29,15 +35,35 @@ class PdfViewerManager implements PlatformView, MethodChannel.MethodCallHandler 
                 .enableSwipe(true)
                 .linkHandler(new UrlLauncher(this.pdfView, this.methodChannel))
                 .swipeHorizontal(false)
+                .onPageScroll(new OnPageScrollListener() {
+                    @Override
+                    public void onPageScrolled(int page, float positionOffset) {
+
+                        HashMap args = new HashMap();
+                        args.put("page", page);
+                        args.put("offsetX", pdfView.getCurrentXOffset());
+                        args.put("offsetY", pdfView.getCurrentYOffset());
+                        args.put("zoom", pdfView.getZoom());
+                        args.put("progress", positionOffset);
+                        methodChannel.invokeMethod("onPageScrolled", args);
+                    }
+                })
+                .onRender(new OnRenderListener() {
+                    @Override
+                    public void onInitiallyRendered(int nbPages) {
+                        methodChannel.invokeMethod("onInitiallyRendered", nbPages);
+                    }
+                })
                 .enableDoubletap(true)
                 .spacing(8)
                 .defaultPage(0)
                 .load();
 
+        pdfView.setMaxZoom(5);
         pdfView.setBackgroundColor(0xdcdcdc);
     }
 
-    void close( ) {
+    void close() {
         pdfView = null;
         methodChannel.invokeMethod("onDestroy", null);
     }
@@ -47,6 +73,13 @@ class PdfViewerManager implements PlatformView, MethodChannel.MethodCallHandler 
         switch (call.method) {
             case "launch":
                 handleOpenPdf(call, result);
+                break;
+            case "setPagePosition":
+                if(pdfView != null) {
+                    HashMap args = (HashMap) call.arguments;
+                    double progress = (double) args.get("progress");
+                    pdfView.setPositionOffset((float)progress);
+                }
                 break;
             default:
                 result.notImplemented();

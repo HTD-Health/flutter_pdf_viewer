@@ -1,6 +1,6 @@
 part of 'pdf_platform_view.dart';
 
-class PdfView extends StatelessWidget {
+class PdfView extends StatefulWidget {
   final File file;
   final PdfViewController controller;
 
@@ -12,37 +12,57 @@ class PdfView extends StatelessWidget {
         super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    Widget pdfView;
+  _PdfViewState createState() => _PdfViewState();
+}
 
+class _PdfViewState extends State<PdfView> {
+  NativeDeviceOrientation _orientation;
+
+  Widget buildPdfView() {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      pdfView = AndroidView(
-        viewType: 'pdf_platform_view/view',
-        onPlatformViewCreated: _onPlatformViewCreated,
-      );
+      return NativeDeviceOrientationReader(builder: (context) {
+        final orientation = NativeDeviceOrientationReader.orientation(context);
+        final prevOrientation = _orientation;
+        _orientation = orientation;
+
+        if (prevOrientation != null && orientation != prevOrientation) {
+          SchedulerBinding.instance
+              .addPostFrameCallback((timeStamp) => setState(() {}));
+
+          return SizedBox();
+        }
+
+        return AndroidView(
+          viewType: 'pdf_platform_view/view',
+          onPlatformViewCreated: _onPlatformViewCreated,
+        );
+      });
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      pdfView = UiKitView(
+      return UiKitView(
         viewType: 'pdf_platform_view/view',
         onPlatformViewCreated: _onPlatformViewCreated,
         creationParamsCodec: const StandardMessageCodec(),
       );
     } else {
-      pdfView = Center(
+      return Center(
         child: Text("NOT IMPLEMENTED"),
       );
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFFdcdcdc),
       ),
-      child: pdfView,
+      child: buildPdfView(),
     );
   }
 
   void _onPlatformViewCreated(int id) {
-    controller
+    widget.controller
       .._initialize(id)
-      .._openPdf(file);
+      .._openPdf(widget.file);
   }
 }
