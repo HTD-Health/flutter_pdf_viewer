@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       appBar: AppBar(title: const Text('Plugin example app')),
       body: Center(
-        child: RaisedButton(
+        child: TextButton(
           child: Text("Open PDF"),
           onPressed: () => Navigator.push(
             context,
@@ -42,7 +42,7 @@ class PDFScreen extends StatefulWidget {
 }
 
 class _PDFScreenState extends State<PDFScreen> {
-  File file;
+  File? file;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _PDFScreenState extends State<PDFScreen> {
 
       body: file != null
           ? PdfView(
-              file: file,
+              file: file!,
               controller: _controller,
             )
           : Center(
