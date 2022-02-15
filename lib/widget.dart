@@ -5,18 +5,17 @@ class PdfView extends StatefulWidget {
   final PdfViewController controller;
 
   const PdfView({
-    Key key,
-    @required this.file,
-    @required this.controller,
-  })  : assert(file != null, 'file is required'),
-        super(key: key);
+    Key? key,
+    required this.file,
+    required this.controller,
+  }) : super(key: key);
 
   @override
   _PdfViewState createState() => _PdfViewState();
 }
 
 class _PdfViewState extends State<PdfView> {
-  NativeDeviceOrientation _orientation;
+  NativeDeviceOrientation? _orientation;
 
   Widget buildPdfView() {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -25,13 +24,12 @@ class _PdfViewState extends State<PdfView> {
         final prevOrientation = _orientation;
         _orientation = orientation;
 
-        if (prevOrientation != null && orientation != prevOrientation) {
+        if (orientation != prevOrientation) {
           SchedulerBinding.instance
-              .addPostFrameCallback((timeStamp) => setState(() {}));
+              ?.addPostFrameCallback((timeStamp) => setState(() {}));
 
           return SizedBox();
         }
-
         return AndroidView(
           viewType: 'pdf_platform_view/view',
           onPlatformViewCreated: _onPlatformViewCreated,
@@ -45,7 +43,7 @@ class _PdfViewState extends State<PdfView> {
       );
     } else {
       return Center(
-        child: Text("NOT IMPLEMENTED"),
+        child: Text('NOT IMPLEMENTED'),
       );
     }
   }

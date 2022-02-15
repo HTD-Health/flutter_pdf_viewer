@@ -7,10 +7,10 @@ class PagePosition {
   final int page;
 
   PagePosition({
-    @required this.currentPosition,
-    @required this.zoom,
-    @required this.page,
-    @required this.progress,
+    required this.currentPosition,
+    required this.zoom,
+    required this.page,
+    required this.progress,
   });
 
   @override
@@ -26,47 +26,52 @@ class PagePosition {
 }
 
 class PdfViewController {
-  MethodChannel _channel;
-  bool get initialized => _channel != null;
+  late MethodChannel? _channel;
+
   bool _rendered = false;
+
+  Completer<bool>? _onRender;
+
+  int? _numberOfPages;
+
   bool get rendered => _rendered;
 
-  Completer<bool> _onRender;
+  int? get numberOfPages => _numberOfPages;
 
-  int _numberOfPages;
-  int get numberOfPages => _numberOfPages;
+  bool get initialized => _channel != null;
 
   PdfViewController({this.onUriPressed});
 
-  final ValueChanged<String> onUriPressed;
-  final pagePosition = ValueNotifier<PagePosition>(null);
+  final ValueChanged<String>? onUriPressed;
+  final pagePosition = ValueNotifier<PagePosition?>(null);
 
   void _initialize(int id) {
     _rendered = false;
-    _channel = new MethodChannel('pdf_platform_view/view_$id')
+    _channel = MethodChannel('pdf_platform_view/view_$id')
       ..setMethodCallHandler(_handleMessages);
 
     if (_onRender?.isCompleted == false) {
-      _onRender.complete(false);
+      _onRender?.complete(false);
     }
-    _onRender = new Completer();
+    _onRender = Completer();
     setPagePosition(pagePosition.value);
   }
 
-  Future<void> setPagePosition(PagePosition position) async {
+  Future<void> setPagePosition(PagePosition? position) async {
     if (position == null) return;
-    final rendered = await _onRender.future;
-    if (rendered) {
-      await _channel.invokeMethod("setPagePosition", position.toMap());
+    final rendered = await _onRender?.future;
+    if (rendered!) {
+      await _channel?.invokeMethod<dynamic>(
+          'setPagePosition', position.toMap());
     }
   }
 
   Future<Null> _handleMessages(MethodCall call) async {
     switch (call.method) {
-      case "handleUri":
+      case 'handleUri':
         assert((() {
           /// this message will appear only in dev mode
-          print("PDF URL pressed: ${call.arguments}");
+          print('PDF URL pressed: ${call.arguments}');
           return true;
         })());
 
@@ -75,18 +80,18 @@ class PdfViewController {
         break;
 
       /// only android event
-      case "onInitiallyRendered":
+      case 'onInitiallyRendered':
         _rendered = true;
         _numberOfPages = call.arguments;
-        if (!_onRender.isCompleted) {
-          _onRender.complete(true);
+        if (!(_onRender?.isCompleted ?? false)) {
+          _onRender!.complete(true);
         }
         break;
 
       /// only android event
-      case "onPageScrolled":
+      case 'onPageScrolled':
         try {
-          final args = call.arguments;
+          final dynamic args = call.arguments;
 
           final event = PagePosition(
             currentPosition: Offset(
@@ -100,17 +105,16 @@ class PdfViewController {
 
           pagePosition.value = event;
         } catch (err) {
-          print("onPageScrolled event error: $err");
+          print('onPageScrolled event error: $err');
         }
         break;
     }
   }
 
   Future<void> _openPdf(File file) async {
-    assert(file != null, 'file cannot be null');
     if (!initialized) throw StateError('$runtimeType is not initialized.');
 
     final args = <String, dynamic>{'path': file.path};
-    await _channel.invokeMethod('launch', args);
+    await _channel?.invokeMethod<dynamic>('launch', args);
   }
 }
