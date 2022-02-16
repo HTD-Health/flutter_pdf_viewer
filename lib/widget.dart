@@ -26,7 +26,7 @@ class _PdfViewState extends State<PdfView> {
 
         if (orientation != prevOrientation) {
           SchedulerBinding.instance
-              ?.addPostFrameCallback((timeStamp) => setState(() {}));
+              !.addPostFrameCallback((timeStamp) => setState(() {}));
 
           return SizedBox();
         }
