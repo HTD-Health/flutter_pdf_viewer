@@ -5,7 +5,8 @@ homepage: https://github.com/kamilklyta/flutter_pdf_viewer
 repository: https://github.com/kamilklyta/flutter_pdf_viewer
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=2.0.0"
 
 dependencies:
   flutter:
