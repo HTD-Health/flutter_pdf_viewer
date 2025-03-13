@@ -1,3 +1,5 @@
+## 0.8.0
+- Replace old Android native implementation
 ## 0.7.0
 - Null safety migration
 ## 0.6.0
