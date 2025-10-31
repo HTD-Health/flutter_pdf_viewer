@@ -1,3 +1,5 @@
+## 0.8.1
+- Remove deprecated Registrar reference in Android native implementation
 ## 0.8.0
 - Replace old Android native implementation
 ## 0.7.0
